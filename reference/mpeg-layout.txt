@@ -1,0 +1,428 @@
+
+            ******************************************
+            * ISO/IEC 11172 (MPEG-1), 13818 (MPEG-2) *
+            *  and 14496-2/3 (MPEG-4 video/audio)    *
+            *   MPEG Bit Stream Quick Reference      *
+            ******************************************
+
+ - values use big endian (network) byte/bit order
+ - general terms: integer = signed value
+ - general values: byte/char/octet = 8-bit value ; short/word = 16-bit value ;
+                    long = 32-bit value
+ - fixed point values: value made up of an integer for whole numbers
+                        and an unsigned value for the decimal
+ - binary values: base-2 long unsigned values (values from 0 and 1)
+ - octal values: base-8 long unsigned values (values from 0 through to 7)
+ - decimal values: base-10 long unsigned values (values from 0 through to 9)
+ - hexadecimal (hex) values: base-16 long unsigned values
+                              (values from 0 to 9 and A to F)
+
+FILE INFO
+
+System Multiplex v1 Suffixes = ".m1s", ".mpeg", ".mpg", ".mpgx", ".mpm"
+System Multiplex v2 Suffixes = ".m2s", ".mpeg", ".mpg", ".mpgx", ".mpm"
+System Multiplex v4 Suffixes = ".mp4", ".m4a"
+Elementary Video v1 Suffixes = ".m1v", ".mpgv", ".mpv"
+Elementary Video v1 use 15 fps Suffix = ".m15"
+Elementary Video v1 use 7.5 fps Suffix = ".m75"
+Elementary Video v2 Suffixes = ".m2v", ".mpgv", ".mpv"
+Elementary Audio v1 Suffixes = ".m1a", ".mpga", ".mpa"
+Elementary Audio v2 Suffixes = ".m2a", ".mpga", ".mpa"
+Elementary Audio Layer Suffixes = ".mpa", ".mp2", ".mp3"
+Elementary Dolby Advanced Audio Suffix = ".aac"
+
+System Multiplex or Elementary Video v1-2 MIME="video/mpeg"
+System Multiplex or Elementary Video v4 MIME="video/mp4"
+Elementary Audio MIME="audio/mpeg"
+System Multiplex v4 Audio MIME="audio/mp4"
+
+MPEG Mac OS Type = "MPEG"
+Elementary Audio Thompson Layer III Mac OS Type = "MPG3"
+MPEG-4 Mac OS Type = "mpg4"
+QuickTime Mac OS Creator = "TVOD"
+
+Developed for the compressing of moving pictures and associated audio and then the
+combining of one or more elementary streams of video and audio, as well as, other
+data into single or multiple streams which are suitable for storage or
+transmission.  This is specified in version two in two forms: the Program Stream and the
+Transport Stream.  Each is optimised for a different set of applications such as
+ATM networks, DBS (Ku-band), station feeds (C-Band), subscription services (CATV bands),
+local stations (UHF and VHF bands) which are error prone transmissions so they use
+transport streams.  Video CDs (white book) and DVD (UDF VOB) are stored content
+so they use v2 program or v1 system streams.
+
+ISO/IEC 11172-2 supports a maximum bit rate of 1.5 Mbits/sec (187.5 kB/sec)
+  with a optimal double speed CD rate of 1.15 Mbits/sec (143.75 kB/sec)
+ISO/IEC 13818-2 profiles support bit rates from
+  3 to 15 Mbits/sec (375 kB/sec to 1.875 MB/sec)
+  with optimal DVD rates from 7 to 9.8 Mbits/sec (875 kB/sec to 1.225 MB/sec)
+ISO/IEC 14496-2 objects support scalable bit rates from
+  10 kbits/sec (1.25 kB/sec) to 6 Mbits/sec (750 kB/sec)
+ISO/IEC 11172-3 and Thompson Layers support bit rates from
+  40 kbits/sec (5 kB/sec) to 448 kbits/sec (56 kB/sec)
+  with 44100 optimal samples per channel bit rates from
+  160 to 64 kbits/sec (20 to 8 kB/sec)
+ISO/IEC 13818-3 and Thompson Layers support bit rates from
+  16 kbits/sec (2 kB/sec) to 256 kbits/sec (32 kB/sec)
+  with 22050 optimal samples per channel bit rates from
+  80 to 32 kbits/sec (10 to 4 kB/sec)
+Thompson Layers support bit rates from
+  16 kbits/sec (2 kB/sec) to 256 kbits/sec (32 kB/sec)
+  with 11025 optimal samples per channel bit rates from
+  40 to 16 kbits/sec (5 to 2 kB/sec)
+ISO/IEC 14496-3 Dolby Advanced Main/LC supports bits rates from 14 kbits/sec (1.75 kB/sec)
+  with optimal 44100 - 48000 samples per channel bit rates from
+  48 to 64 kbits/sec (6 to 8 kB/sec)
+
+
+ISO/IEC 11172/13818-1 SYSTEM MULTIPLEXED PACKETIZED ELEMENTARY STREAM AND HEADERS
+  - MPEG v2 NOTE: transport system multiplexes retransmit header info more frequently
+    for recovery from data loss.  Program streams are stored streams so this isn't necessary.
+
+-> 4 bytes pack header start code = long hex value of 0x000001BA
+-> 8 bits v1 pack header = byte clock and multiplex pack rate bit info
+OR
+-> 12 bits v2 pack header = 1 1/2 bytes clock and multiplex pack rate with extension bit info
+  - NOTE: pack header appears more than once
+
+-> 4 bytes system header start code = long hex value of 0x000001BB
+-> 16 bits block length = short unsigned length of start code block
+-> variable bits system header = multiplex system bit info
+  - NOTE: only one system header per file bit stream
+
+-> 4 bytes optional VCD on-the-fly padding ID = long hex value of 0x00000000
+-> 10 or variable bits block padding = 1 1/4 or variable bytes pad set to zero
+  - NOTE: can appear more than once or not at all
+
+-> 4 bytes optional padding block start code = long hex value of 0x000001BE
+-> 16 bits block length = short unsigned length of start code block
+-> variable bits padding = multiplex padding bits set to 1
+  - NOTE: can appear more than once or not at all
+
+-> 4 bytes optional private 1 block start code = long hex value of 0x000001BD
+-> 16 bits block length = short unsigned length of start code block
+-> 96 bits MPEG v1 PES header = 12 bytes PES bit info
+OR
+-> 24 - 392 bits MPEG v2 PES header = short PES bit info + byte unsigned PES header size + optional PES timecode/info
+-> variable bits custom data = subtitles or audio for DVD
+  - DVD: can appear contain overlay image text or Dolby v3 audio or DTS audio or PCM audio
+
+-> 4 bytes optional private 2 block start code = long hex value of 0x000001BF
+-> 16 bits block length = short unsigned length of start code block
+-> variable bits custom data = audio/video navigation bit info for DVD
+
+-> 4 bytes optional audio 0 - 31 block start code = long hex value of 0x000001C0 - 0x000001DF
+-> 16 bits block length = short unsigned length of start code block
+-> 96 bits MPEG v1 PES header = 12 bytes PES bit info
+OR
+-> 24 - 392 bits MPEG v2 PES header
+     = short PES bit info + byte unsigned PES header size + optional PES timecode/info
+-> variable bits elementary audio payload = elementary audio blocks
+  - NOTE: audio blocks appear more than once.  DVD uses only audio 0 - 7 blocks.
+
+-> 4 bytes optional video 0 - 15 block start code = long hex value of 0x000001E0 - 0x000001EF
+-> 16 bits block length = short unsigneed length of start code block
+-> 96 bits MPEG v1 PES header = 12 bytes PES bit info
+OR
+-> 24 - 392 bits MPEG v2 PES header
+     = short PES bit info + byte unsigned PES header size + optional PES timecode/info
+-> variable bits elementary video payload = elementary video header + other video start codes
+  - NOTE: video blocks appear more than once.  VCD/DVD uses only video 0 blocks.
+  - NOTE: generally one block contains at least one frame of video.
+
+-> 4 bytes stream end start code = long hex value of 0x000001B9
+  - NOTE: only one stream end to terminate demultiplexing of file bit stream
+
+
+ISO/IEC 11172-2/13818-2 (MPEG-1/2 video) ELEMENTARY VIDEO HEADER
+
+-> 4 bytes video sequence start code = long hex value of 0x000001B3
+-> 12 bits horizontal samples = 3 nibbles unsigned number of X samples in width
+-> 12 bits vertical samples = 3 nibbles unsigned number of Y samples in height
+-> 4 bits pixel scaling = 1 nibble unsigned scale type
+  - v1 by area types are Reserved = 0; 1:1 = 1; 0.6735 = 2; 0.7031 = 3
+  - v1 by area types are 0.7615 PAL 16:9 = 4; 0.8055 = 5; 0.8437 NTSC 16:9 = 6; 0.8935 = 7
+  - v1 by area types are 54:59 PAL = 8; 0.9815 = 9; 1.0255 = 10; 1.0695 = 11
+  - v1 by area types are 11:10 NTSC = 12; 1.1575 = 13; 1.2015 = 14; Reserved = 15
+  - v2 by height types are Reserved = 0; 1:1 = 1; 4:3 = 2; 16:9 = 3; 11:5 = 4
+  - v2 by height types are Reserved or v1 by image types = 5 - 15
+  - NOTES on common area and height scales
+  - 1:1 (1.0) area: means one sample is equivalent to one pixel
+  - 54:59 (0.9153) PAL: defined for scaling the CCIR 704 625 line system to a 4:3 aspect
+  - 11:10 (1.1) NTSC: defined for scaling the CCIR 704 525 line system to a 4:3 aspect
+  - MPEG v2 scaling: defines the scaling of the height by the cropped/scaled width
+  - 11:5 (2.2) height: defined (rarely used) for a wider cinema-like scale than 16:9
+-> 4 bits timing rate = 1 nibble unsigned fps type
+  - types are Reserved = 0; 24/1.001 frames/sec = 1 ; 24 frames/sec = 2
+  - types are 25 frames/sec = 3; 30/1.001 frames/sec = 4; 30 frames/sec = 5
+  - types are 50 frames/sec = 6; 60/1.001 frames/sec = 7; 60 frames/sec = 8
+  - types are Reserved = 9 - 15
+-> 18 bits data block rate = 4 1/2 nibbles unsigned bit rate in 400 bps units
+-> 1 bit header ID = 1/4 nibble flag
+-> 10 bits video buffering verifier = 2 1/2 nibbles unsigned decompression buffer in 16,000 byte units
+-> 1 bit constrained parameter = 1/4 nibble flag (set to zero for MPEG v2)
+-> 1 bit load software intra quantizer matrix = 1/4 nibble flag
+-> 64 byte software defined quantizer table - only if above is true otherwise no values
+-> 1 bit load software intra non quantizer matrix = 1/4 nibble flag
+-> 64 byte software defined quantizer table - only if above is true otherwise no values
+-> Continues with other MPEG video start codes and associated data like GOPs, pictures and slices
+  - NOTE: only one video header per file bit stream
+
+-> 4 bytes video user meta data start code = long hex value of 0x000001B2
+  - NOTE: optional private data like an ASCII text string may be added
+          by encoders of the video bit stream and is limited to 23 bytes
+
+-> 4 bytes video sequence end start code = long hex value of 0x000001B7
+  - NOTE: only one video sequence end to terminate decoding of video bit stream
+
+
+ISO/IEC 14496-2 (MPEG-4 video) ELEMENTARY VIDEO HEADER
+
+-> 4 bytes visual object sequence start code = long hex value of 0x000001B0
+-> 8 bits profile/level indicator = 1 byte unsigned number
+
+-> 4 bytes user meta data start code = long hex value of 0x000001B2
+  - NOTE: optional private data like an ASCII text string may be added
+          by encoders of the video bit stream and should be limited to 23 bytes
+
+-> 4 bytes visual object start code = long hex value of 0x000001B5 
+-> 1 bit has id marker flag = 1/4 nibble flag
+
+_ID_Marker_Section_
+-> 4 bits version id = 1 nibble unsigned value - only if marker is true
+  - version id types are ISO 14496-2 = 1
+-> 3 bits visual object priority = 3/4 nibble unsigned value - only if marker is true
+  - priorities are 1 through to 7
+
+-> 4 bits visual object type = 1 nibble unsigned value
+  - types are video = 1 ; still texture = 2 ; mesh = 3 ; face = 4
+-> 1 bit video signal type = 1/4 nibble flag
+  - NOTE: if this is false Y has a sample range of 16 through to 235
+
+_YUV_Clamping_Section_
+-> 3 bits video format = 3/4 nibble unsigned value - only if signal type is true
+  - formats are component = 0 ; PAL = 1 ; NTSC = 2
+  - formats are SECAM = 3 ; MAC = 4 ; unspecified = 5
+-> 1 bit video (Y'CbCr formulae) range = 1/4 nibble flag - only if signal type is true
+  - flags are uses long formalae (default) = 0 ; uses short formulae = 1
+-> 1 bit color description = 1/4 nibble flag - only if signal type is true
+-> 8 bits color primaries = 1 byte unsigned value - only if description is true
+  - primaries are ITU-R BT.709 (default) = 1 ; unspecified = 2 ; reserved = 3
+  - primaries are ITU-R BT.470-2 M = 4 ; ITU-R BT.470-2 B/G = 5
+  - primaries are SMPTE 170M = 6 ; SMPTE 240M (1987) = 7 ; generic film = 8
+-> 8 bits transfer (gamma) characteristics = 1 byte unsigned value - only if description is true
+  - characteristics are Rec ITU-R BT.709 V (default) = 1 ; unspecified = 2 ; reserved =3
+  - characteristics are Rec ITU-R BT.470-2 M = 4 ; Rec ITU-R BT.470-2 B/G = 5
+  - characteristics are SMPTE 170M V = 6 ; SMPTE 240M (1987) V = 7 ; linear = 8
+  - characteristics are logarithmic 100:1 = 9 ; logarithmic 316.22777:1 = 10
+-> 8 bits matrix coefficients = 1 byte unsigned value - only if description is true
+  - derived from Rec ITU-R BT.709 E'Y (default) = 1 ; unspecified = 2 ; reserved = 3
+  - derived from FCC E'Y = 4 ; Rec ITU BT.470-2 B/G E'Y = 5
+  - derived from SMPTE 170M E'Y = 6 ; SMPTE 240 (1987) E'Y = 7
+
+-> 4 bytes video 0 - 31 object start codes = long hex value of 0x00000100 - 0x0000011F
+
+-> 4 bytes video 0 - 15 object layer start codes = long hex value of 0x00000120 - 0x0000012F
+-> 1 bit random accessible video layer = 1/4 nibble flag
+-> 8 bits video object type indication = 1 byte unsigned value
+  - types are simple = 1 ; simple scalable = 2 ; core = 3 ; main = 4
+  - types are N-bit = 5 ; basic ani 2D texture = 6 ; ani 2D mesh = 7
+  - types are simple face = 8 ; still scalable texture = 9
+-> 1 bit object layer id section = 1/4 nibble flag
+
+_Object_Layer_ID_Section_
+-> 4 bits video object layer verid = 1 nibble unsigned value - only if layer id is true
+  - version id types are ISO 14496-2 = 1
+-> 3 bits video object layer priority = 3/4 nibble unsigned value - only if layer id is true
+  - priorities are 1 through to 7
+
+-> 4 bits image pixel scaling = 1 nibble unsigned scale type
+  - types are Reserved = 0; 1:1 = 1 ; 12:11 (PAL norm) = 2
+  - types are 10:11 (NTSC norm) = 3 ; 16:11 (PAL wide) = 4   
+  - types are 40:33 (NTSC wide) = 5 ; reserved = 6 - 14 ; extended = 15
+
+_Image_Extended_Scaling_Section_
+-> 8 bits X scaling = 1 byte unsigned scale of horizontal - only if scaling is entended
+-> 8 bits Y scaling = 1 byte unsigned scale of vertical - only if scaling is entended
+
+-> 1 bit object layer control parameters section = 1/4 nibble flag
+
+_Object_Layer_Control_Parameters_Section_
+-> 2 bits chroma format = 1/2 nibble unsigned value - only if control is true
+  - formats are 4:2:0 = 1
+-> 1 bit low delay = 1/4 nibble flag - only if control is true
+  - if true then no B-VOPs are present
+-> 1 bit video buffer verifier parameters section = 1/4 nibble flag
+  - only if control is true
+
+_VBV_Parameters_Section_
+-> 15 bits first half bit rate = 3 3/4 nibbles unsigned value - only if buffer is true
+-> 1 bit marker = 1/4 nibble flag - only if buffer is true
+-> 15 bits latter half bit rate = 3 3/4 nibbles unsigned value - only if buffer is true
+  - NOTE: rate units in 400 bits/second
+-> 1 bit marker = 1/4 nibble flag - only if buffer is true
+-> 15 bits first half vbv size = 3 3/4 nibbles unsigned value - only if buffer is true
+-> 1 bit marker = 1/4 nibble flag - only if buffer is true
+-> 3 bits latter half vbv size = 3/4 nibble unsigned value - only if buffer is true
+  - NOTE: VBV uses 16384 bit units
+-> 11 bits first half vbv occupancy = 2 3/4 nibbles unsigned value - only if buffer is true
+-> 1 bit marker = 1/4 nibble flag - only if buffer is true
+-> 15 bits latter half vbv occupancy = 3 3/4 nibbles unsigned value - only if buffer is true
+-> 1 bit marker = 1/4 nibble flag - only if buffer is true
+
+-> 2 bits object layer shape = 1/2 nibble unsigned value
+  - shapes are rectangular = 0 ; binary = 1 ; binary only = 2 ; grayscale = 3
+-> 1 bit marker = 1/4 nibble flag
+-> 16 bits vop time increment resolution = 2 bytes unsigned number of units in a second
+  - NOTE: number of units in one second ie, timing rate
+  - common progressive units are NTSC mono = 60 ; PAL/SECAM = 50 ; film = 24
+  - NTSC color full frame progressive unit = 60000
+  - common interlaced units are NTSC mono = 30 ;  PAL/SECAM = 25
+  - NTSC color interlaced units are full frame = 30000 ; film pull-down = 24000
+-> 1 bit marker = 1/4 nibble flag
+-> 1 bit fixed vop rate section = 1/4 nibble flag
+  - NOTE: if false VOP is varible
+
+_VOP_Divisor_Section_
+-> 16 bits fixed vop time increment = 2 bytes unsigned rate divisor
+  - only if rate is true
+  - common divisors are non-fractional rates = 1 ; NTSC color rates = 1001
+
+-> 1 bit marker = 1/4 nibble flag - only if layer shape is rectangular
+-> 13 bits horizontal samples = 3 1/4 nibbles unsigned X samples
+  - only if layer shape is rectangular 
+-> 1 bit marker = 1/4 nibble flag
+  - only if layer shape is rectangular
+-> 13 bits vertical samples = 3 1/4 bytes unsigned Y samples
+  - only if layer shape is rectangular
+-> 1 bit marker = 1/4 nibble flag
+  - only if layer shape is rectangular
+-> 1 bit interlaced = 1/4 nibble flag
+  - only if layer shape is not binary only
+-> 1 bit obmc disabled = 1/4 nibble flag
+  - only if layer shape is not binary only
+  - NOTE: disabling of overlapped block motion compensation
+-> 1 bit sprite enabled = 1/4 nibble flag
+  - only if layer shape is not binary only
+
+-> 4 bytes visual object sequence end start code = long hex value of 0x000001B1
+  - NOTE: only one video sequence end to terminate decoding of video bit stream
+
+
+ISO/IEC 11172-3/13818-3 (MPEG-1/2 audio) ELEMENTARY LAYER AUDIO DATA TRANSPORT HEADER
+
+-> 11 bits header block ID = 2 3/4 nibbles unsigned value of 2047 (ALL BITS ON)
+-> 2 bits version ID = 1/2 nibble unsigned version type
+  - types are Fraunhofer (v2.5) = 0; Reserved = 1
+  - types are ISO/IEC 13818-3 (MPEG v2) = 2 ; ISO/IEC 11172-3 (MPEG v1) = 3
+-> 2 bits layer ID = 1/2 nibble unsigned layer type
+  - types are Reserved = 0 ; Fraunhofer layer III = 1
+  - types are ISO/IEC layer II = 2 ; ISO/IEC layer I = 3
+-> 1 bit CRC data validating = 1/4 nibble flag
+  - flags are 2 byte CRC follows header = 0 ;  not used = 1
+-> 4 bits block rate = 1 nibble unsigned bit rate type
+  - NOTE: L1 = layer I ;  L2 = layer II ;  L3 = layer III
+  - types are Reserved = 0; v1 - 32 kbps or v2/2.5 L2/3 - 8 kbps = 1
+  - types are v1 L1- 64kbps or v1 L2/v2 L1- 48kbps or v1 L3- 40kbps or v2/2.5 L2/3-16kbps = 2
+  - types are v1 L1- 96kbps or v1 L2/v2 L1- 56kbps or v1 L3- 48kbps or v2/2.5 L2/3-24kbps = 3
+  - types are v1 L1-128kbps or v1 L2/v2 L1- 64kbps or v1 L3- 56kbps or v2/2.5 L2/3-32kbps = 4
+  - types are v1 L1-160kbps or v1 L2/v2 L1- 80kbps or v1 L3- 64kbps or v2/2.5 L2/3-40kbps = 5
+  - types are v1 L1-192kbps or v1 L2/v2 L1- 96kbps or v1 L3- 80kbps or v2 L2/3-48kbps = 6
+  - types are v1 L1-224kbps or v1 L2/v2 L1-112kbps or v1 L3- 96kbps or v2 L2/3-56kbps = 7
+  - types are v1 L1-256kbps or v1 L2/v2 L1-128kbps or v1 L3-112kbps or v2 L2/3-64kbps = 8
+  - types are v1 L1-288kbps or v1 L2-160kbps or v1 L3-128kbps or v2 L1-144kbps or v2 L2/3-80kbps = 9
+  - types are v1 L1-320kbps or v1 L2-192kbps or v1 L3/v2 L1-160kbps or v2 L2/3-96kbps = 10
+  - types are v1 L1-352kbps or v1 L2-224kbps or v1 L3-192kbps or v2 L1-176kbps or v2 L2/3-112 kbps = 11
+  - types are v1 L1-384kbps or v1 L2-256kbps or v1 L3-224kbps or v2 L1-192kbps or v2 L2/3-128 kbps = 12
+  - types are v1 L1-416kbps or v1 L2-320kbps or v1 L3-256kbps or v2 L1-224kbps or v2 L2/3-144kbps = 13
+  - types are v1 L1-448kbps or v1 L2-384kbps or v1 L3-320kbps or v2 L1-256kbps/v2 L2/3-160kbps = 14
+  - types are Reserved = 15
+  - NOTES suggesting optimal bit block rate quality per channel are below
+  - L1: v1 32000 samples - 160 kbps ; v2 16000 samples -  80 kbps ; v2.5  8000 samples - 48 kbps
+  - L1: v1 44100 samples - 192 kbps ; v2 22050 samples -  96 kbps ; v2.5 11025 samples - 48 kbps
+  - L1: v1 48000 samples - 224 kbps ; v2 24000 samples -  112 kbps ; v2.5 12000 samples - 56 kbps
+  - L2: v1 32000 samples -  96 kbps ; v2 16000 samples -  48 kbps ; v2.5  8000 samples - 24 kbps
+  - L2: v1 44100 samples - 112 kbps ; v2 22050 samples -  56 kbps ; v2.5 11025 samples - 28 kbps
+  - L2: v1 48000 samples - 128 kbps ; v2 24000 samples -  64 kbps ; v2.5 12000 samples - 32 kbps
+  - L3: v1 32000 samples -  48 kbps ; v2 16000 samples -  24 kbps ; v2.5  8000 samples - 16 kbps
+  - L3: v1 44100 samples -  64 kbps ; v2 22050 samples -  32 kbps ; v2.5 11025 samples - 16 kbps
+  - L3: v1 48000 samples -  80 kbps ; v2 24000 samples -  40 kbps ; v2.5 12000 samples - 24 kbps
+-> 2 bits timing rate = 1/2 nibble unsigned rate type
+  - types are v1 - 44100 Hz/v2 - 22050 Hz/v2.5 - 11025 Hz = 0
+  - types are v1 - 48000 Hz/v2 - 24000 Hz/v2.5 - 12000 Hz = 1
+  - types are v1 - 32000 Hz/v2 - 16000 Hz/v2.5 - 8000 Hz = 2
+  - types are Reserved = 3
+-> 1 bit block padding = 1/4 nibble flag
+  - flags are not used = 0 ; 1 byte pad for L2/3 - 4 byte pad for L1 = 1
+-> 1 bit private = 1/4 nibble flag (software defined)
+-> 2 bits audio channel config = 1/2 nibble unsigned channel type
+  - types are stereo = 0 ; joint stereo = 1 ; dual monaural = 2 ; monaural = 3
+-> 2 bits joint stereo mode = 1/2 nibble unsigned mode type
+  - types are none = 0 ; intensity = 1 ; ms = 2 ; intensity/ms = 3
+-> 1 bit copyright = 1/4 nibble flag
+  - types are unrestricted material = 0 ; copyright controlled material = 1
+-> 1 bit original = 1/4 nibble flag
+  - flags are copy or duplicate encoding = 0 ; original or first encoding = 1
+-> 2 bits audio error correction = 1/2 nibble unsigned emphasis type
+  - types are none = 0 ;  50/15 ms = 1 ;  Reserved = 2 ;  CCIT J.17 = 3
+-> Continues with layer compressed data/slots and possibly more audio blocks
+
+
+ISO/IEC 13818-3/14496-3 (MPEG-2/4 audio) ELEMENTARY DOLBY ADVANCED AUDIO DATA TRANSPORT HEADER
+
+-> 12 bits header block ID = 1 1/2 bytes unsigned value of 4906 (ALL BITS ON)
+-> 1 bit AAC ID = 1/4 nibble unsigned type
+  - types are ISO/IEC 14496-3 = 0 ; ISO/IEC 13818-3 = 1
+-> 2 bits layer ID = 1/2 nibble unsigned level type set to zero
+-> 1 bit CRC data validating = 1/4 nibble flag
+  - flags are 2 byte CRC follows header = 0 ;  not used = 1
+-> 2 bits AAC profile = 1/2 nibble unsigned type
+  - types are Main = 0 ; Low Complexity = 1
+  - types are Scalable Sampling Rate = 2
+  - type for ISO/IEC 13818-3 Reserved = 3
+  - type for ISO/IEC 14496-3 Long Term Prediction = 3
+-> 4 bits timing rate = 1 nibble unsigned rate type
+  - types are 96000 Hz = 0 ;  88200 Hz = 1 ;  64000 Hz = 2
+  - types are 48000 Hz = 3 ;  44100 Hz = 4 ;  32000 Hz = 5
+  - types are 24000 Hz = 6 ;  22050 Hz = 7 ;  16000 Hz = 8
+  - types are 12000 Hz = 9 ;  11025 Hz = 10 ;  8000 Hz = 11
+-> 1 bit private = 1/4 nibble flag (software defined)
+-> 3 bits audio channel config = 3/4 nibble unsigned number of channels
+-> 1 bit original = 1/4 nibble flag
+  - flags are copy or duplicate encoding = 0 ; original or first encoding = 1
+-> 1 bit home = 1/4 nibble flag
+  - flags are foreign source = 0 ; home source = 1
+-> 1 bit copyright = 1/4 nibble flag
+  - flags are unrestricted material = 0 ; copyright controlled material = 1
+-> 1 bit copyright follows = 1/4 nibble flag
+  - flags are block(s) do not use above = 0 ; block(s) use above = 1
+-> 13 bits block size = 3 1/4 nibbles unsigned byte size
+-> 11 bits buffering = 2 3/4 nibbles unsigned decompression buffer size (VBR is 1792 [ALL BITS ON])
+-> 2 bits AAC data = 1/2 nibble flag
+  - flags are block(s) contain AAC data = 0; block(s) do not contain AAC data = 1 - 3
+-> Continues with AAC compressed data/slots or other data and possibly more audio blocks
+
+
+ISO/IEC 14496-1 (MPEG-4 system) ADVANCED AUDIO DECODE CONFIG DESCRIPTOR
+
+-> 5 bits AAC object = 1 1/4 nibble unsigned type
+  - types are Reserved = 0 ;  Main = 1 ; Low Complexity = 2
+  - types are Scalable Sampling Rate = 3 ; Long Term Prediction = 4
+  - types are High Efficiency (SBR) AAC = 5 ; Low Delay = 23
+  - types are Low Complexity w/ error resilience = 17
+  - types are Long Term Prediction w/ error resilience = 19
+  - types are DRM Low Complexity w/ error resilience = 27
+-> 4 bits timing rate = 1 nibble unsigned rate type
+  - types are 96000 Hz = 0 ;  88200 Hz = 1 ;  64000 Hz = 2
+  - types are 48000 Hz = 3 ;  44100 Hz = 4 ;  32000 Hz = 5
+  - types are 24000 Hz = 6 ;  22050 Hz = 7 ;  16000 Hz = 8
+  - types are 12000 Hz = 9 ;  11025 Hz = 10 ;  8000 Hz = 11
+  - types are custom rate = 15
+
+_Custom_Timing_Rate_Section_
+-> 24 bits timing rate = 3 bytes unsigned rate - only if timing is custom
+
+-> 4 bits audio channel config = 1 nibble unsigned number of channels
+-> 1 bit GA block size = 1/8 byte flag - 1024 bytes = 0 or 960 bytes = 1
+-> 1 bit GA custom decode = 1/8 byte true/false flag - default = false
+-> 1 bit GA extended descriptor = 1/8 byte true/false flag - default = false
